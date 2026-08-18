@@ -465,18 +465,46 @@
         const successMsg = document.getElementById('successMessage');
         const submitBtn = document.getElementById('submitBtn');
 
-        form.addEventListener('submit', (e) => {
+        //        // PENTING: Ganti URL di bawah ini dengan Web App URL dari Google Apps Script Anda!
+        const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx84MmtbgqQXN78d-Uh2Nuhl9FUjh6MeEHpBi-BXuaeOh6UspzLPK3TVBfhAkwxikVb/exec';
+
+        //        form.addEventListener('submit', (e) => {
             e.preventDefault(); // Prevent page reload
             
             // Visual loading state
             submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Memproses...';
             submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+            submitBtn.disabled = true;
             
-            // Simulate API Call delay (Here is where your GAS webhook URL will go later)
-            setTimeout(() => {
+            // Collect data from the input fields
+            const formData = {
+                name: document.getElementById('name').value,
+                role: document.getElementById('role').value,
+                school: document.getElementById('school').value,
+                problem: document.getElementById('problem').value
+            };
+            
+            // Send the data to your Google Apps Script backend
+            fetch(GAS_WEB_APP_URL, {
+                method: 'POST',
+                // Using text/plain prevents complex CORS preflight issues with Google Scripts
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // If successful, hide the form and show the success message
                 form.classList.add('hidden');
                 successMsg.classList.remove('hidden');
-            }, 1500);
+            })
+            .catch(error => {
+                // If there's an error, log it and reset the button
+                console.error('Error:', error);
+                alert('Mohon maaf, terjadi kesalahan sistem. Silakan coba beberapa saat lagi.');
+                submitBtn.innerHTML = 'Kirim Permintaan Audit <i class="fa-solid fa-paper-plane ml-2"></i>';
+                submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+                submitBtn.disabled = false;
+            });
         });
 
         function resetForm() {
