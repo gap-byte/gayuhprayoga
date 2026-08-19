@@ -392,6 +392,11 @@
                     </div>
                     
                     <div>
+                        <label for="whatsapp" class="block text-sm font-medium text-slate-300 mb-2">No. WhatsApp Aktif</label>
+                        <input type="tel" id="whatsapp" required class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-white placeholder-slate-500 transition" placeholder="081234567890">
+                    </div>
+                    
+                    <div>
                         <label for="problem" class="block text-sm font-medium text-slate-300 mb-2">Tantangan Terbesar Saat Ini?</label>
                         <textarea id="problem" rows="3" class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-white placeholder-slate-500 transition" placeholder="Contoh: Guru banyak lembur mengerjakan raport, takut siswa curang pakai AI..."></textarea>
                     </div>
@@ -480,6 +485,7 @@
                 name: document.getElementById('name').value,
                 role: document.getElementById('role').value,
                 school: document.getElementById('school').value,
+                whatsapp: document.getElementById('whatsapp').value,
                 problem: document.getElementById('problem').value
             };
             
