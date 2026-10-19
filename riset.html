@@ -91,7 +91,7 @@
 
     <script>
         // --- 1. REPLACE THIS URL LATER WITH YOUR DEPLOYED GAS WEB APP URL ---
-        const GAS_API_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"; 
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwt55v1RG13zIkFed9tFfOMaKyBP6gXcnqZxvCMk1nkl_R8jLHrA2kBiO-AwOETpwb6GA/exec"; 
 
         const researchGrid = document.getElementById('research-grid');
 
@@ -138,7 +138,7 @@
         async function fetchResearchData() {
             try {
                 // We use mock data if the URL isn't set yet to prevent a broken UI during setup
-                if (GAS_API_URL.includes('YOUR_SCRIPT_ID')) {
+                if (GAS_API_URL.includes('AKfycbwt55v1RG13zIkFed9tFfOMaKyBP6gXcnqZxvCMk1nkl_R8jLHrA2kBiO-AwOETpwb6GA')) {
                     throw new Error("API URL not configured.");
                 }
 
