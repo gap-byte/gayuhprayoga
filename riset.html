@@ -43,6 +43,25 @@
         </div>
     </header>
 
+    <!-- Executive Subscription Banner -->
+    <section class="bg-blue-600 border-b border-blue-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <form onsubmit="handleSubscribe(event)" class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center text-white">
+                    <svg class="w-6 h-6 mr-3 text-blue-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    <div>
+                        <p class="text-sm font-bold">Executive Briefing Mingguan</p>
+                        <p class="text-xs text-blue-200">1 ringkasan riset AI taktis ke email Anda, mingguan.</p>
+                    </div>
+                </div>
+                <div class="flex w-full sm:w-auto gap-2">
+                    <input type="email" id="sub-email" required placeholder="Email Anda..." class="w-full sm:w-64 px-3 py-2 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900">
+                    <button type="submit" id="sub-btn" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2 rounded-lg text-sm font-bold whitespace-nowrap transition-colors shadow-lg">Berlangganan</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
     <!-- Search & Filter Bar -->
     <section class="bg-white border-b border-slate-200 sticky top-16 z-40 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
