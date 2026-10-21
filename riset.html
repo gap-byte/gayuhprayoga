@@ -13,7 +13,7 @@
 </head>
 <body class="text-slate-800 antialiased flex flex-col min-h-screen">
 
-    <!-- Navbar (Matches your main site style) -->
+    <!-- Navbar -->
     <nav class="glass-nav fixed w-full z-50 border-b border-slate-800 top-0">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
@@ -43,19 +43,19 @@
         </div>
     </header>
 
-    <!-- Search & Filter Bar (UI only for now, prep for Google Sheets backend) -->
+    <!-- Search & Filter Bar -->
     <section class="bg-white border-b border-slate-200 sticky top-16 z-40 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
                 <div class="w-full md:w-1/2 relative">
                     <svg class="w-5 h-5 absolute left-3 top-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <input type="text" placeholder="Cari topik (misal: RPP, Kebijakan, ChatGPT)..." class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                    <input type="text" id="search-input" placeholder="Cari topik (misal: RPP, Kebijakan, ChatGPT)..." class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
                 </div>
                 <div class="w-full md:w-auto flex space-x-2 overflow-x-auto pb-2 md:pb-0">
-                    <button class="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium whitespace-nowrap">Semua Topik</button>
-                    <button class="px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg text-sm font-medium whitespace-nowrap transition-colors">Regulasi & Etika</button>
-                    <button class="px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg text-sm font-medium whitespace-nowrap transition-colors">Beban Admin</button>
-                    <button class="px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg text-sm font-medium whitespace-nowrap transition-colors">Pedagogi</button>
+                    <button onclick="setFilter('all', this)" class="filter-btn px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium whitespace-nowrap transition-colors">Semua Topik</button>
+                    <button onclick="setFilter('regulasi', this)" class="filter-btn px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg text-sm font-medium whitespace-nowrap transition-colors">Regulasi & Etika</button>
+                    <button onclick="setFilter('admin', this)" class="filter-btn px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg text-sm font-medium whitespace-nowrap transition-colors">Beban Admin</button>
+                    <button onclick="setFilter('pedagogi', this)" class="filter-btn px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg text-sm font-medium whitespace-nowrap transition-colors">Pedagogi</button>
                 </div>
             </div>
         </div>
@@ -63,10 +63,9 @@
 
     <!-- Content Grid -->
     <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <!-- We added an ID 'research-grid' here so JS can target it -->
         <div id="research-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             
-            <!-- We will replace the hardcoded articles with a loading state -->
+            <!-- Loading State -->
             <div id="loading-state" class="col-span-full flex flex-col items-center justify-center py-20 text-slate-400">
                 <svg class="animate-spin h-10 w-10 mb-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -89,39 +88,52 @@
         </div>
     </footer>
 
+    <!-- JavaScript Data Logic -->
     <script>
-        // --- 1. REPLACE THIS URL LATER WITH YOUR DEPLOYED GAS WEB APP URL ---
+        // --- ⚠️ GANTI URL DI BAWAH INI DENGAN URL WEB APP ANDA ⚠️ ---
+        // Pastikan Anda menyalinnya di antara tanda kutip " " dan jangan menghapus tanda kutipnya!
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwt55v1RG13zIkFed9tFfOMaKyBP6gXcnqZxvCMk1nkl_R8jLHrA2kBiO-AwOETpwb6GA/exec"; 
 
-        const researchGrid = document.getElementById('research-grid');
+        let allResearchData = [];
+        let currentCategory = 'all';
 
-        // Function to determine color theme based on category
+        const researchGrid = document.getElementById('research-grid');
+        const searchInput = document.getElementById('search-input');
+
         function getCategoryStyle(category) {
-            const cat = category.toLowerCase();
-            if (cat.includes('regulasi')) return { border: 'hover:border-blue-300', badge: 'text-blue-700 bg-blue-50', link: 'text-blue-600 hover:text-blue-800' };
-            if (cat.includes('admin')) return { border: 'hover:border-emerald-300', badge: 'text-emerald-700 bg-emerald-50', link: 'text-emerald-600 hover:text-emerald-800' };
-            return { border: 'hover:border-purple-300', badge: 'text-purple-700 bg-purple-50', link: 'text-purple-600 hover:text-purple-800' }; // Default to pedagogi/purple
+            const cat = (category || '').toLowerCase();
+            if (cat.includes('regulasi') || cat.includes('etika')) {
+                return { border: 'hover:border-blue-300', badge: 'text-blue-700 bg-blue-50', link: 'text-blue-600 hover:text-blue-800' };
+            }
+            if (cat.includes('admin') || cat.includes('beban')) {
+                return { border: 'hover:border-emerald-300', badge: 'text-emerald-700 bg-emerald-50', link: 'text-emerald-600 hover:text-emerald-800' };
+            }
+            return { border: 'hover:border-purple-300', badge: 'text-purple-700 bg-purple-50', link: 'text-purple-600 hover:text-purple-800' };
         }
 
-        // Function to build HTML for a single card
         function createCardHTML(item) {
             const style = getCategoryStyle(item.Kategori);
-            
+            const kategori = item.Kategori || "Umum";
+            const institusi = item.Institusi || "Riset Global";
+            const judul = item.Judul || "Tanpa Judul";
+            const konteks = item.Konteks || "";
+            const tindakan = item.Tindakan || "";
+
             return `
             <article class="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden hover:shadow-lg ${style.border} transition-all duration-300">
                 <div class="p-6 flex-grow">
                     <div class="flex items-center justify-between mb-4">
-                        <span class="text-xs font-bold ${style.badge} px-2 py-1 rounded uppercase tracking-wide">${item.Kategori}</span>
+                        <span class="text-xs font-bold ${style.badge} px-2 py-1 rounded uppercase tracking-wide">${kategori}</span>
                         <span class="text-xs text-slate-500 font-medium flex items-center">
                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                            ${item.Institusi}
+                            ${institusi}
                         </span>
                     </div>
-                    <h2 class="text-xl font-bold text-slate-900 mb-3 leading-snug">${item.Judul}</h2>
-                    <p class="text-slate-600 text-sm mb-4 line-clamp-3">${item.Konteks}</p>
+                    <h2 class="text-xl font-bold text-slate-900 mb-3 leading-snug">${judul}</h2>
+                    <p class="text-slate-600 text-sm mb-4 line-clamp-3">${konteks}</p>
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
                         <p class="text-xs font-bold text-slate-800 uppercase mb-1">Tindakan Yayasan:</p>
-                        <p class="text-sm text-slate-700">${item.Tindakan}</p>
+                        <p class="text-sm text-slate-700">${tindakan}</p>
                     </div>
                 </div>
                 <div class="border-t border-slate-100 p-4 bg-slate-50">
@@ -130,38 +142,106 @@
                         <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                     </a>
                 </div>
-            </article>
-            `;
+            </article>`;
         }
 
-        // Fetch data from Google Apps Script
+        function renderCards(data) {
+            if (!data || data.length === 0) {
+                researchGrid.innerHTML = '<div class="col-span-full text-center text-slate-500 py-10 font-medium">Belum ada riset yang sesuai dengan pencarian Anda.</div>';
+                return;
+            }
+            researchGrid.innerHTML = data.map(item => createCardHTML(item)).join('');
+        }
+
+        function filterData() {
+            const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+            
+            const filtered = allResearchData.filter(item => {
+                const matchesCategory = currentCategory === 'all' || 
+                    (item.Kategori && item.Kategori.toLowerCase().includes(currentCategory));
+                
+                const matchesQuery = !query || 
+                    (item.Judul && item.Judul.toLowerCase().includes(query)) ||
+                    (item.Konteks && item.Konteks.toLowerCase().includes(query)) ||
+                    (item.Institusi && item.Institusi.toLowerCase().includes(query)) ||
+                    (item.Tindakan && item.Tindakan.toLowerCase().includes(query));
+
+                return matchesCategory && matchesQuery;
+            });
+
+            renderCards(filtered);
+        }
+
+        function setFilter(category, buttonEl) {
+            currentCategory = category;
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-slate-900', 'text-white');
+                btn.classList.add('bg-slate-100', 'text-slate-600');
+            });
+            if (buttonEl) {
+                buttonEl.classList.remove('bg-slate-100', 'text-slate-600');
+                buttonEl.classList.add('bg-slate-900', 'text-white');
+            }
+            filterData();
+        }
+
         async function fetchResearchData() {
             try {
-                // We use mock data if the URL isn't set yet to prevent a broken UI during setup
-                if (GAS_API_URL.includes(https://script.google.com/macros/s/AKfycbwt55v1RG13zIkFed9tFfOMaKyBP6gXcnqZxvCMk1nkl_R8jLHrA2kBiO-AwOETpwb6GA/exec)) {
-                    throw new Error("API URL not configured.");
+                // Check if URL is still placeholder
+                if (!GAS_API_URL || GAS_API_URL.includes('YOUR_ACTUAL_ID_HERE')) {
+                    throw new Error("Tautan API belum disetel. Silakan masukkan Web App URL di file HTML (baris 100).");
                 }
 
-                const response = await fetch(https://script.google.com/macros/s/AKfycbwt55v1RG13zIkFed9tFfOMaKyBP6gXcnqZxvCMk1nkl_R8jLHrA2kBiO-AwOETpwb6GA/exec);
-                const json = await response.json();
+                console.log("Mencoba mengambil data dari:", GAS_API_URL);
+                const response = await fetch(GAS_API_URL);
                 
-                if (json.status === "success" && json.data.length > 0) {
-                    researchGrid.innerHTML = json.data.map(item => createCardHTML(item)).join('');
+                // If Google blocks it (CORS issue), it throws an error before reaching here
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const json = await response.json();
+                console.log("Data berhasil diambil:", json);
+
+                if (json.status === "success") {
+                    allResearchData = json.data || [];
+                    if (allResearchData.length === 0) {
+                        researchGrid.innerHTML = '<div class="col-span-full text-center text-slate-500 py-10">Belum ada riset yang dipublikasikan di Sheet "DatabaseRiset". Silakan isi baris kedua di spreadsheet Anda.</div>';
+                    } else {
+                        renderCards(allResearchData);
+                    }
                 } else {
-                    researchGrid.innerHTML = `<div class="col-span-full text-center text-slate-500 py-10">Belum ada riset yang dipublikasikan.</div>`;
+                    throw new Error(json.message || "Gagal memproses data JSON dari API.");
                 }
             } catch (error) {
-                console.error("Fetch error, displaying fallback/mock data.", error);
-                // Fallback UI to show what it looks like before API is connected
-                researchGrid.innerHTML = `<div class="col-span-full text-center py-10">
-                    <p class="text-red-500 font-bold mb-2">Sistem belum terkoneksi ke Database.</p>
-                    <p class="text-sm text-slate-500">Mohon update GAS_API_URL di dalam file riset.html</p>
-                </div>`;
+                console.error("Fetch Error Detail:", error);
+                
+                // Hides spinner and shows actual error UI
+                researchGrid.innerHTML = `
+                    <div class="col-span-full max-w-2xl mx-auto w-full">
+                        <div class="bg-red-50 rounded-2xl border border-red-200 p-6 shadow-sm">
+                            <div class="flex items-center mb-3">
+                                <svg class="w-6 h-6 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <p class="text-red-700 font-bold text-lg">Gagal Memuat Database Riset</p>
+                            </div>
+                            <p class="text-sm text-red-600 mb-4 font-mono bg-red-100 p-2 rounded">${error.message}</p>
+                            <div class="text-sm text-slate-700 text-left bg-white p-4 rounded-xl border border-slate-200 space-y-2">
+                                <p class="font-bold text-slate-900 mb-2">Cara Memperbaiki (Cek List):</p>
+                                <p>1. Cek kode HTML baris 100. Pastikan URL sudah diganti dan berada di dalam tanda kutip ganda <code>"..."</code>.</p>
+                                <p>2. Buka Google Apps Script > <b>Manage Deployments</b>.</p>
+                                <p>3. Pastikan konfigurasi Web App diatur ke: Execute as: <b>Me</b>, dan Who has access: <b>Anyone</b>.</p>
+                            </div>
+                        </div>
+                    </div>`;
             }
         }
 
-        // Initialize on load
+        // Initialize
         document.addEventListener('DOMContentLoaded', fetchResearchData);
+        if (searchInput) {
+            searchInput.addEventListener('input', filterData);
+        }
     </script>
 </body>
 </html>
