@@ -51,16 +51,17 @@
                     <svg class="w-6 h-6 mr-3 text-blue-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                     <div>
                         <p class="text-sm font-bold">Executive Briefing Mingguan</p>
-                        <p class="text-xs text-blue-200">1 ringkasan riset AI taktis ke email Anda, mingguan.</p>
+                        <p class="text-xs text-blue-200">1 ringkasan riset AI taktis ke email Anda setiap Jumat pagi.</p>
                     </div>
                 </div>
                 <div class="flex w-full sm:w-auto gap-2">
-                    <input type="email" id="sub-email" required placeholder="Email Anda..." class="w-full sm:w-64 px-3 py-2 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900">
+                    <input type="email" id="sub-email" required placeholder="Email instansi Anda..." class="w-full sm:w-64 px-3 py-2 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900">
                     <button type="submit" id="sub-btn" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2 rounded-lg text-sm font-bold whitespace-nowrap transition-colors shadow-lg">Berlangganan</button>
                 </div>
             </form>
         </div>
     </section>
+
 
     <!-- Search & Filter Bar -->
     <section class="bg-white border-b border-slate-200 sticky top-16 z-40 shadow-sm">
@@ -260,6 +261,53 @@
         document.addEventListener('DOMContentLoaded', fetchResearchData);
         if (searchInput) {
             searchInput.addEventListener('input', filterData);
+        }
+
+        // ==========================================
+        // NEW LOGIC: HANDLE EMAIL SUBSCRIPTIONS
+        // ==========================================
+        async function handleSubscribe(event) {
+            event.preventDefault();
+            const emailInput = document.getElementById('sub-email');
+            const btn = document.getElementById('sub-btn');
+            const originalText = btn.innerText;
+            
+            btn.innerText = "Memproses...";
+            btn.disabled = true;
+
+            try {
+                // Send to your existing Apps Script URL
+                await fetch(GAS_API_URL, {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        'type': 'subscribe',
+                        'email': emailInput.value
+                    })
+                });
+
+                btn.innerText = "Berhasil!";
+                btn.classList.replace('bg-slate-900', 'bg-emerald-500');
+                btn.classList.replace('hover:bg-slate-800', 'hover:bg-emerald-600');
+                emailInput.value = "";
+                
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    btn.classList.replace('bg-emerald-500', 'bg-slate-900');
+                    btn.classList.replace('hover:bg-emerald-600', 'hover:bg-slate-800');
+                }, 3000);
+
+            } catch (error) {
+                btn.innerText = "Gagal!";
+                btn.classList.replace('bg-slate-900', 'bg-red-500');
+                btn.classList.replace('hover:bg-slate-800', 'hover:bg-red-600');
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    btn.classList.replace('bg-red-500', 'bg-slate-900');
+                    btn.classList.replace('hover:bg-red-600', 'hover:bg-slate-800');
+                }, 3000);
+            }
         }
     </script>
 </body>
