@@ -138,42 +138,46 @@
         }
         // START COPYING HERE:
         function createCardHTML(item) {
-        const style = getCategoryStyle(item.Kategori);
-        const kategori = item.Kategori || "Umum";
-        const institusi = item.Institusi || "Riset Global";
-        const judul = item.Judul || "Tanpa Judul";
-        const konteks = item.Konteks || "";
-        const tindakan = item.Tindakan || "";
+    const style = getCategoryStyle(item.Kategori);
+    const kategori = item.Kategori || "Umum";
+    const institusi = item.Institusi || "Riset Global";
+    const judul = item.Judul || "Tanpa Judul";
+    const konteks = item.Konteks || "";
+    const tindakan = item.Tindakan || "";
 
-        return `
-        <article class="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden hover:shadow-lg transition-all duration-300 relative group">
-            <div class="p-6 flex-grow">
-                <div class="flex items-center justify-between mb-4">
-                    <span class="text-xs font-bold ${style.badge} px-2 py-1 rounded uppercase tracking-wide">${kategori}</span>
-                    <span class="text-xs text-slate-500 font-medium flex items-center">
-                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                        ${institusi}
-                    </span>
-                </div>
-                <h2 class="text-xl font-bold text-slate-900 mb-3 leading-snug group-hover:text-blue-600 transition-colors">${judul}</h2>
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 mb-4">
-                    <p class="text-xs font-bold text-slate-800 uppercase mb-1">💡 Konteks Riset:</p>
-                    <p class="text-sm text-slate-600 line-clamp-3">${konteks}</p>
-                </div>
-                <div class="mb-2">
-                    <p class="text-xs font-bold text-slate-800 uppercase mb-1">Tindakan Yayasan:</p>
-                    <p class="text-sm text-slate-700">${tindakan}</p>
-                </div>
+    return `
+    <article class="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden hover:shadow-lg transition-all duration-300 relative group h-full">
+        <div class="p-6 flex-grow">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-xs font-bold ${style.badge} px-2 py-1 rounded uppercase tracking-wide">${kategori}</span>
+                <span class="text-xs text-slate-500 font-medium flex items-center">
+                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    ${institusi}
+                </span>
             </div>
-            <div class="border-t border-slate-100 p-4 px-6 bg-slate-50">
-                <a href="#" class="${style.link} text-sm font-semibold flex items-center transition-colors">
-                    Baca Selengkapnya
-                    <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </a>
+            <h2 class="text-xl font-bold text-slate-900 mb-3 leading-snug group-hover:text-blue-600 transition-colors">${judul}</h2>
+            
+            <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 mb-4">
+                <p class="text-xs font-bold text-slate-800 uppercase mb-1">💡 Konteks Riset:</p>
+                <!-- Notice the 'card-konteks' and 'line-clamp-3' classes -->
+                <p class="text-sm text-slate-600 line-clamp-3 card-konteks transition-all duration-300">${konteks}</p>
             </div>
-        </article>`;
-    }
-    // END COPYING HERE
+            <div class="mb-2">
+                <p class="text-xs font-bold text-slate-800 uppercase mb-1">Tindakan Yayasan:</p>
+                <!-- Notice the 'card-tindakan' and 'line-clamp-2' classes -->
+                <p class="text-sm text-slate-700 line-clamp-2 card-tindakan transition-all duration-300">${tindakan}</p>
+            </div>
+        </div>
+        <div class="border-t border-slate-100 p-4 px-6 bg-slate-50 mt-auto">
+            <!-- Changed from <a> to <button> for Javascript action -->
+            <button onclick="toggleCard(this)" class="${style.link} text-sm font-semibold flex items-center w-full focus:outline-none transition-colors">
+                <span class="btn-text">Baca Selengkapnya</span>
+                <svg class="w-4 h-4 ml-1 btn-icon transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+        </div>
+    </article>`;
+}
+        // END COPYING HERE
         
         function renderCards(data) {
             if (!data || data.length === 0) {
@@ -319,6 +323,36 @@
                 }, 3000);
             }
         }
+
+        function toggleCard(btn) {
+    // Find the specific card that was clicked
+    const article = btn.closest('article');
+    
+    // Find the text elements inside this specific card
+    const konteks = article.querySelector('.card-konteks');
+    const tindakan = article.querySelector('.card-tindakan');
+    const btnText = btn.querySelector('.btn-text');
+    const btnIcon = btn.querySelector('.btn-icon');
+
+    // Check if the card is currently clamped (shrunk)
+    if (konteks.classList.contains('line-clamp-3')) {
+        // Expand the card
+        konteks.classList.remove('line-clamp-3');
+        if (tindakan) tindakan.classList.remove('line-clamp-2');
+        
+        // Update button text and flip the arrow
+        btnText.innerText = "Tutup Ringkasan";
+        btnIcon.classList.add('rotate-180');
+    } else {
+        // Shrink the card back down
+        konteks.classList.add('line-clamp-3');
+        if (tindakan) tindakan.classList.add('line-clamp-2');
+        
+        // Reset button text and arrow
+        btnText.innerText = "Baca Selengkapnya";
+        btnIcon.classList.remove('rotate-180');
+    }
+}
     </script>
 </body>
 </html>
