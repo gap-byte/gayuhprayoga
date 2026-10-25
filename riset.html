@@ -136,7 +136,7 @@
             }
             return { border: 'hover:border-purple-300', badge: 'text-purple-700 bg-purple-50', link: 'text-purple-600 hover:text-purple-800' };
         }
-
+        // START COPYING HERE:
         function createCardHTML(item) {
         const style = getCategoryStyle(item.Kategori);
         const kategori = item.Kategori || "Umum";
@@ -147,8 +147,7 @@
 
         return `
         <article class="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden hover:shadow-lg transition-all duration-300 relative group">
-            <div class="absolute top-0 left-0 w-1 h-full ${style.bg.replace('100', '500')}"></div>
-            <div class="p-6 flex-grow pl-8">
+            <div class="p-6 flex-grow">
                 <div class="flex items-center justify-between mb-4">
                     <span class="text-xs font-bold ${style.badge} px-2 py-1 rounded uppercase tracking-wide">${kategori}</span>
                     <span class="text-xs text-slate-500 font-medium flex items-center">
@@ -166,7 +165,7 @@
                     <p class="text-sm text-slate-700">${tindakan}</p>
                 </div>
             </div>
-            <div class="border-t border-slate-100 p-4 px-8 bg-slate-50">
+            <div class="border-t border-slate-100 p-4 px-6 bg-slate-50">
                 <a href="#" class="${style.link} text-sm font-semibold flex items-center transition-colors">
                     Baca Selengkapnya
                     <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
@@ -174,7 +173,8 @@
             </div>
         </article>`;
     }
-
+    // END COPYING HERE
+        
         function renderCards(data) {
             if (!data || data.length === 0) {
                 researchGrid.innerHTML = '<div class="col-span-full text-center text-slate-500 py-10 font-medium">Belum ada riset yang sesuai dengan pencarian Anda.</div>';
